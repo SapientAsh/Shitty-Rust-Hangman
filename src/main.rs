@@ -1,12 +1,22 @@
-use rand::Rng;
-use std::io;
+extern crate reqwest;
 
-fn main() {
+use std::io;
+use rand::Rng;
+
+fn main() -> std::io::Result<()> {
+    const MIN_LENGTH: usize = 5;
     let mut rng = rand::thread_rng();
-    const PLANETS: [&str; 8] =  ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
+    let file = reqwest::blocking::get("https://raw.githubusercontent.com/Xethron/Hangman/master/words.txt").unwrap()
+    .text().unwrap();
+    let words: Vec<&str> = file.split("\n")
+    .filter( | line | line != &"" && line.len() >= MIN_LENGTH)
+    .collect();
+
     const MAX_FAIL: u8 = 5;
     let mut fails: u8 = 0;
-    let secret: Vec<char> = PLANETS[rng.gen_range(0..PLANETS.len())].chars().collect();
+    let secret: Vec<char> = words[rng.gen_range(0..words.len())]
+    .chars()
+    .collect();
     let mut guesses: Vec<char> = Vec::new();
     let mut print = vec!['-'; secret.len()];
      
@@ -52,8 +62,11 @@ fn main() {
         //lose if too many fails
         if fails > MAX_FAIL {
             println!("Wow you're really bad at this");
+            println!("The word was {}", secret.iter().collect::<String>());
             break;
         }
         
     }
+
+    Ok(())
 }
