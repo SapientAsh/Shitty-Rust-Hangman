@@ -6,8 +6,8 @@ use rand::Rng;
 fn main() -> std::io::Result<()> {
     const MIN_LENGTH: usize = 5;
     let mut rng = rand::thread_rng();
-    let file = reqwest::blocking::get("https://raw.githubusercontent.com/Xethron/Hangman/master/words.txt").unwrap()
-    .text().unwrap();
+    let file = reqwest::blocking::get("http://www.mieliestronk.com/corncob_lowercase.txt").expect("Couldn't retrieve word file")
+    .text().expect("File could not be interpreted");
     let words: Vec<&str> = file.split("\n")
     .filter( | line | line != &"" && line.len() >= MIN_LENGTH)
     .collect();
